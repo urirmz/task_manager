@@ -4,6 +4,7 @@ import com.uriel.task_manager.dto.TaskRequest;
 import com.uriel.task_manager.entity.Task;
 import com.uriel.task_manager.entity.TaskStatus;
 import com.uriel.task_manager.entity.User;
+import com.uriel.task_manager.exception.NotFoundException;
 import com.uriel.task_manager.repository.TaskRepository;
 import com.uriel.task_manager.repository.UserRepository;
 
@@ -38,7 +39,7 @@ public class TaskService {
 
         if (request.getAssignedUserId() != null) {
             User user = userRepository.findById(request.getAssignedUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getAssignedUserId()));
+                    .orElseThrow(() -> new NotFoundException("User not found with id: " + request.getAssignedUserId()));
             task.setAssignedUser(user);
         }
 
@@ -60,7 +61,7 @@ public class TaskService {
 
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Task not found with id: " + id));
     }
 
     @Transactional

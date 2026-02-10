@@ -143,8 +143,18 @@
 
         <div class="card">
           <div class="card-header">
-            <h2>Tasks</h2>
-            <div class="filter-controls">
+            <div class="header-left">
+              <h2>Tasks</h2>
+              <div class="view-switcher">
+                <button id="listViewBtn" class="btn-view active" title="List View">
+                  <span class="view-icon">List view 📋</span>
+                </button>
+                <button id="calendarViewBtn" class="btn-view" title="Calendar View">
+                  <span class="view-icon">Calendar view 📅</span>
+                </button>
+              </div>
+            </div>
+            <div id="listControls" class="filter-controls">
               <select id="statusFilter" class="filter-select">
                 <option value="">All Tasks</option>
                 <option value="PENDING">Pending</option>
@@ -159,8 +169,28 @@
             </div>
           </div>
           <div class="card-body">
-            <div id="taskList" class="task-list">
-              <p class="loading">Loading tasks...</p>
+            <div id="listView">
+              <div id="taskList" class="task-list">
+                <p class="loading">Loading tasks...</p>
+              </div>
+            </div>
+            
+            <div id="calendarView" style="display: none;">
+              <div class="calendar-header">
+                <button id="prevMonth" class="btn-nav">◀</button>
+                <h3 id="currentMonthYear"></h3>
+                <button id="nextMonth" class="btn-nav">▶</button>
+              </div>
+              <div class="calendar-grid">
+                <div class="calendar-day-label">Sun</div>
+                <div class="calendar-day-label">Mon</div>
+                <div class="calendar-day-label">Tue</div>
+                <div class="calendar-day-label">Wed</div>
+                <div class="calendar-day-label">Thu</div>
+                <div class="calendar-day-label">Fri</div>
+                <div class="calendar-day-label">Sat</div>
+              </div>
+              <div id="calendarDays" class="calendar-grid days"></div>
             </div>
           </div>
         </div>

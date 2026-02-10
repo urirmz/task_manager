@@ -1,6 +1,8 @@
 let currentUser = null;
 let allTasks = [];
 let allUsers = [];
+let currentView = "list";
+let calendarDate = new Date();
 
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
@@ -11,10 +13,20 @@ const userGreeting = document.getElementById("userGreeting");
 const userRole = document.getElementById("userRole");
 const taskForm = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
+const listControls = document.getElementById("listControls");
 const statusFilter = document.getElementById("statusFilter");
 const sortBy = document.getElementById("sortBy");
 const assignedUser = document.getElementById("assignedUser");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
+
+const listViewBtn = document.getElementById("listViewBtn");
+const calendarViewBtn = document.getElementById("calendarViewBtn");
+const listView = document.getElementById("listView");
+const calendarView = document.getElementById("calendarView");
+const calendarDays = document.getElementById("calendarDays");
+const currentMonthYear = document.getElementById("currentMonthYear");
+const prevMonthBtn = document.getElementById("prevMonth");
+const nextMonthBtn = document.getElementById("nextMonth");
 
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
@@ -28,6 +40,36 @@ function setupEventListeners() {
   statusFilter.addEventListener("change", filterAndDisplayTasks);
   sortBy.addEventListener("change", filterAndDisplayTasks);
   exportCsvBtn.addEventListener("click", handleExportTasks);
+
+  listViewBtn.addEventListener("click", () => switchView("list"));
+  calendarViewBtn.addEventListener("click", () => switchView("calendar"));
+  prevMonthBtn.addEventListener("click", () => {
+    calendarDate.setMonth(calendarDate.getMonth() - 1);
+    renderCalendar();
+  });
+  nextMonthBtn.addEventListener("click", () => {
+    calendarDate.setMonth(calendarDate.getMonth() + 1);
+    renderCalendar();
+  });
+}
+
+function switchView(view) {
+  currentView = view;
+  if (view === "list") {
+    listView.style.display = "block";
+    calendarView.style.display = "none";
+    listControls.style.display = "flex";
+    listViewBtn.classList.add("active");
+    calendarViewBtn.classList.remove("active");
+    filterAndDisplayTasks();
+  } else {
+    listView.style.display = "none";
+    calendarView.style.display = "block";
+    listControls.style.display = "none";
+    listViewBtn.classList.remove("active");
+    calendarViewBtn.classList.add("active");
+    renderCalendar();
+  }
 }
 
 async function checkAuth() {
@@ -145,7 +187,11 @@ async function loadTasks() {
       const data = await response.json();
       allTasks = data.tasks;
       updateStatistics();
-      filterAndDisplayTasks();
+      if (currentView === "calendar") {
+        renderCalendar();
+      } else {
+        filterAndDisplayTasks();
+      }
     } else {
       taskList.innerHTML =
         '<p class="error-message show">Failed to load tasks</p>';
@@ -348,6 +394,81 @@ function toggleCreateForm() {
     form.style.display = "none";
     icon.classList.remove("open");
   }
+}
+
+function renderCalendar() {
+  calendarDays.innerHTML = "";
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+
+  currentMonthYear.textContent = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(calendarDate);
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthDays = new Date(year, month, 0).getDate();
+
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  // Previous month padding
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const day = prevMonthDays - i;
+    calendarDays.appendChild(createDayCell(day, true));
+  }
+
+  // Current month days
+  for (let i = 1; i <= daysInMonth; i++) {
+    const isToday = isCurrentMonth && today.getDate() === i;
+    calendarDays.appendChild(createDayCell(i, false, isToday));
+  }
+
+  // Next month padding
+  const totalCells = firstDay + daysInMonth;
+  const nextMonthPadding = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= nextMonthPadding; i++) {
+    calendarDays.appendChild(createDayCell(i, true));
+  }
+}
+
+function createDayCell(day, isOtherMonth, isToday = false) {
+  const cell = document.createElement("div");
+  cell.className = "calendar-day";
+  if (isOtherMonth) cell.classList.add("other-month");
+  if (isToday) cell.classList.add("today");
+
+  const dayNum = document.createElement("span");
+  dayNum.className = "day-number";
+  dayNum.textContent = day;
+  cell.appendChild(dayNum);
+
+  if (!isOtherMonth) {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    const dayTasks = allTasks.filter(task => {
+      if (!task.scheduledDateTime) return false;
+      return task.scheduledDateTime.startsWith(dateStr);
+    });
+
+    if (dayTasks.length > 0) {
+      const container = document.createElement("div");
+      container.className = "calendar-tasks";
+      dayTasks.forEach(task => {
+        const item = document.createElement("div");
+        item.className = `calendar-task-item ${task.status.toLowerCase()}`;
+        item.textContent = task.title;
+        item.title = `${task.title} (${task.status})`;
+        container.appendChild(item);
+      });
+      cell.appendChild(container);
+    }
+  }
+
+  return cell;
 }
 
 function escapeHtml(text) {

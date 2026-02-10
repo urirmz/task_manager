@@ -22,6 +22,11 @@ public class ControllerExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(NotFoundException exception) {
+        return buildErrorResponse(exception, HttpStatus.NOT_FOUND);
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(Exception exception, HttpStatus status) {
         ErrorResponse response = new ErrorResponse();
         response.setMessage(exception.getMessage());
