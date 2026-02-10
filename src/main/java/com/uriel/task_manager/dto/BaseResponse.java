@@ -7,15 +7,19 @@ import java.util.Objects;
 
 public class BaseResponse {
 
-    private @Nullable String status;
+    private @Nullable String apiStatus;
     private @Nullable LocalDateTime timeStamp;
 
-    public String getStatus() {
-        return status;
+    public BaseResponse() {
+        this.timeStamp = LocalDateTime.now();
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public String getApiStatus() {
+        return apiStatus;
+    }
+
+    public void setApiStatus(String apiStatus) {
+        this.apiStatus = apiStatus;
     }
 
     public LocalDateTime getTimeStamp() {
@@ -28,14 +32,16 @@ public class BaseResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         BaseResponse that = (BaseResponse) o;
-        return Objects.equals(status, that.status) && Objects.equals(timeStamp, that.timeStamp);
+        return Objects.equals(apiStatus, that.apiStatus) && Objects.equals(timeStamp, that.timeStamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(status, timeStamp);
+        return Objects.hash(apiStatus, timeStamp);
     }
+
 }

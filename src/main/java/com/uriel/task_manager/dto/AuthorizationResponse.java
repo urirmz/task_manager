@@ -1,41 +1,54 @@
 package com.uriel.task_manager.dto;
 
+import java.util.Objects;
+
 public class AuthorizationResponse extends BaseResponse {
 
-    private String id;
-    private String userName;
-    private String name;
-    private String role;
+    private boolean authenticated;
+    private UserResponse user;
+    private String message;
 
-    public String getId() {
-        return id;
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
     }
 
-    public String getUserName() {
-        return userName;
+    public UserResponse getUser() {
+        return user;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser(UserResponse user) {
+        this.user = user;
     }
 
-    public String getName() {
-        return name;
+    public String getMessage() {
+        return message;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getRole() {
-        return role;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        AuthorizationResponse that = (AuthorizationResponse) o;
+        return authenticated == that.authenticated &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(message, that.message);
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), authenticated, user, message);
     }
+
 }

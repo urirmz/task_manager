@@ -14,6 +14,7 @@ const taskList = document.getElementById("taskList");
 const statusFilter = document.getElementById("statusFilter");
 const sortBy = document.getElementById("sortBy");
 const assignedUser = document.getElementById("assignedUser");
+const exportCsvBtn = document.getElementById("exportCsvBtn");
 
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
@@ -26,6 +27,7 @@ function setupEventListeners() {
   taskForm.addEventListener("submit", handleCreateTask);
   statusFilter.addEventListener("change", filterAndDisplayTasks);
   sortBy.addEventListener("change", filterAndDisplayTasks);
+  exportCsvBtn.addEventListener("click", handleExportTasks);
 }
 
 async function checkAuth() {
@@ -64,7 +66,7 @@ async function handleLogin(e) {
 
     const data = await response.json();
 
-    if (data.success) {
+    if (data.apiStatus === 'SUCCESS') {
       currentUser = data.user;
       showDashboard();
     } else {
@@ -118,7 +120,8 @@ async function loadUsers() {
     });
 
     if (response.ok) {
-      allUsers = await response.json();
+      const data = await response.json();
+      allUsers = data.users;
       assignedUser.innerHTML = '<option value="">Unassigned</option>';
       allUsers.forEach((user) => {
         const option = document.createElement("option");
@@ -139,7 +142,8 @@ async function loadTasks() {
     });
 
     if (response.ok) {
-      allTasks = await response.json();
+      const data = await response.json();
+      allTasks = data.tasks;
       updateStatistics();
       filterAndDisplayTasks();
     } else {
@@ -180,12 +184,16 @@ async function handleCreateTask(e) {
       loadTasks();
     } else {
       const error = await response.json();
-      alert("Error creating task: " + (error.error || "Unknown error"));
+      alert("Error creating task: " + (error.message || "Unknown error"));
     }
   } catch (error) {
     console.error("Error creating task:", error);
     alert("Error creating task");
   }
+}
+
+function handleExportTasks() {
+  window.location.href = "/api/tasks/export";
 }
 
 async function approveTask(taskId) {
@@ -201,7 +209,7 @@ async function approveTask(taskId) {
       loadTasks();
     } else {
       const error = await response.json();
-      alert("Error approving task: " + (error.error || "Unknown error"));
+      alert("Error approving task: " + (error.message || "Unknown error"));
     }
   } catch (error) {
     console.error("Error approving task:", error);
@@ -222,7 +230,7 @@ async function rejectTask(taskId) {
       loadTasks();
     } else {
       const error = await response.json();
-      alert("Error rejecting task: " + (error.error || "Unknown error"));
+      alert("Error rejecting task: " + (error.message || "Unknown error"));
     }
   } catch (error) {
     console.error("Error rejecting task:", error);

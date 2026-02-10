@@ -21,4 +21,22 @@ public class ErrorResponse extends BaseResponse {
         this.stackTrace = stackTrace;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        ErrorResponse that = (ErrorResponse) o;
+        return java.util.Objects.equals(message, that.message) &&
+                java.util.Objects.equals(stackTrace, that.stackTrace);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(super.hashCode(), message, stackTrace);
+    }
+
 }

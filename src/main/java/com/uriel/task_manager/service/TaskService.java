@@ -83,4 +83,32 @@ public class TaskService {
         return updatedTask;
     }
 
+    public String generateTasksCsv() {
+        List<Task> tasks = taskRepository.findAll();
+        StringBuilder csv = new StringBuilder();
+        csv.append("ID,Title,Description,Status,Priority,Assigned User,Scheduled Date,Created Date\n");
+
+        for (Task task : tasks) {
+            csv.append(task.getId()).append(",")
+                    .append(escapeCsv(task.getTitle())).append(",")
+                    .append(escapeCsv(task.getDescription())).append(",")
+                    .append(task.getStatus()).append(",")
+                    .append(task.getPriority()).append(",")
+                    .append(task.getAssignedUser() != null ? escapeCsv(task.getAssignedUser().getName()) : "Unassigned")
+                    .append(",")
+                    .append(task.getScheduledDateTime() != null ? task.getScheduledDateTime() : "N/A").append(",")
+                    .append(task.getCreatedDate()).append("\n");
+        }
+        return csv.toString();
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null)
+            return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
+
 }

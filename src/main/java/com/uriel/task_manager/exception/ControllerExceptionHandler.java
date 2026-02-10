@@ -7,7 +7,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @ControllerAdvice
@@ -26,9 +25,8 @@ public class ControllerExceptionHandler {
     private ResponseEntity<ErrorResponse> buildErrorResponse(Exception exception, HttpStatus status) {
         ErrorResponse response = new ErrorResponse();
         response.setMessage(exception.getMessage());
-        response.setStatus(String.valueOf(status));
+        response.setApiStatus(String.valueOf(status.value()));
         response.setStackTrace(Arrays.toString(exception.getStackTrace()));
-        response.setTimeStamp(LocalDateTime.now());
         return new ResponseEntity<>(response, status);
     }
 

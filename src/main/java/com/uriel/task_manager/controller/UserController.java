@@ -1,5 +1,7 @@
 package com.uriel.task_manager.controller;
 
+import com.uriel.task_manager.dto.UserListResponse;
+import com.uriel.task_manager.dto.UserResponse;
 import com.uriel.task_manager.entity.User;
 import com.uriel.task_manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,17 +24,23 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Map<String, String>>> getAllUsers() {
+    public ResponseEntity<UserListResponse> getAllUsers() {
         List<User> users = userService.getAllUsers();
 
-        List<Map<String, String>> response = users.stream()
-                .map(user -> Map.of(
-                        "id", String.valueOf(user.getId()),
-                        "username", user.getUsername(),
-                        "name", user.getName(),
-                        "role", user.getRole().name()))
-                .toList();
+        UserListResponse response = new UserListResponse();
+        response.setUsers(users.stream().map(this::mapToUserResponse).toList());
+        response.setApiStatus("SUCCESS");
 
         return ResponseEntity.ok(response);
     }
+
+    private UserResponse mapToUserResponse(User user) {
+        UserResponse dto = new UserResponse();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setName(user.getName());
+        dto.setRole(user.getRole().name());
+        return dto;
+    }
+
 }
